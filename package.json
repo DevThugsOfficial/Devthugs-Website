@@ -6,7 +6,6 @@
     },
     "scripts": {
         "vercel-build": "vite build",
-        "build": "vite build",
         "dev": "vite"
     },
     "devDependencies": {
