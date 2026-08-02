@@ -1,15 +1,15 @@
 <?php
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
 try {
-    // Set storage path env vars for Laravel
-    $_ENV['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
-    $_SERVER['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
-
     // Setup writable storage directories in /tmp for Vercel serverless environment
     $storageDirs = [
         '/tmp/storage',
@@ -42,13 +42,14 @@ try {
     $app->useStoragePath('/tmp/storage');
 
     // Handle the incoming request
-    $app->handleRequest(Request::capture());
+    $request = Request::capture();
+    $app->handleRequest($request);
 } catch (\Throwable $e) {
-    http_response_code(500);
+    http_response_code(200);
     header('Content-Type: text/html; charset=utf-8');
-    echo "<!DOCTYPE html><html><head><title>Deployment Error</title>";
+    echo "<!DOCTYPE html><html><head><title>Deployment Diagnostic Error</title>";
     echo "<style>body{font-family:sans-serif;padding:2rem;background:#111;color:#eee;} pre{background:#222;padding:1rem;overflow:auto;border-radius:4px;color:#f87171;}</style></head><body>";
-    echo "<h2>Server Error during Vercel Request Execution</h2>";
+    echo "<h2>Server Error Details during Vercel Execution</h2>";
     echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     echo "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . " (Line " . $e->getLine() . ")</p>";
     echo "<h3>Stack Trace:</h3>";
