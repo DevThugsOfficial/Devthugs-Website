@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'ai_chat' => [
+        'enabled' => env('AI_CHAT_ENABLED', false),
+        'provider' => env('AI_CHAT_PROVIDER', 'ollama'),
+        'base_url' => env('AI_CHAT_BASE_URL', 'http://127.0.0.1:11434/v1'),
+        'model' => env('AI_CHAT_MODEL', 'qwen2.5:3b'),
+        'api_key' => env('OLLAMA_API_KEY'),
+        'timeout' => env('AI_CHAT_TIMEOUT', 60),
+    ],
+
 ];

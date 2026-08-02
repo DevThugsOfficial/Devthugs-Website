@@ -34,8 +34,8 @@
                                     playsinline
                                     class="w-full h-full object-cover transition-transform duration-700 group-hover/slide:scale-105"
                                 ></video>
-                                <div class="absolute inset-0 bg-gradient-to-br {{ $project['gradient'] }} mix-blend-overlay opacity-30 transition-opacity duration-500 group-hover/slide:opacity-40"></div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-dark-secondary via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-dark-secondary/50 md:to-dark-secondary"></div>
+                                <div class="absolute inset-0 bg-linear-to-br {{ $project['gradient'] }} mix-blend-overlay opacity-30 transition-opacity duration-500 group-hover/slide:opacity-40"></div>
+                                <div class="absolute inset-0 bg-linear-to-t from-dark-secondary via-transparent to-transparent md:bg-linear-to-r md:from-transparent md:via-dark-secondary/50 md:to-dark-secondary"></div>
                                 <div class="absolute top-6 left-6 z-10">
                                     <span class="px-4 py-1.5 rounded-full bg-dark-base/80 backdrop-blur-md border border-white/10 text-white/90 text-xs font-inter font-medium tracking-wide shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                                         {{ $project['tag'] }}
@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="w-full md:w-2/5 p-8 md:p-12 flex flex-col justify-center relative">
-                                <div class="absolute inset-0 bg-gradient-to-br {{ $project['gradient'] }} opacity-[0.03] pointer-events-none"></div>
+                                <div class="absolute inset-0 bg-linear-to-br {{ $project['gradient'] }} opacity-[0.03] pointer-events-none"></div>
                                 <div class="relative z-10">
                                     <div class="mb-6 flex items-center justify-start {{ ($project['tall_logo'] ?? false) ? 'h-28 md:h-32' : 'h-20 md:h-24' }}">
                                         <img

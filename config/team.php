@@ -30,17 +30,7 @@ return [
     $member('Ladyjane', 'bayang.png', 'Patent Draftsman'),
     $member('Nerry', 'nerry.png', 'Patent Illustrator'),
     $member('Lovely', 'lovely.png', 'Marketing Analyst'),
-
-    [
-        'name' => 'Vincent',
-        'role' => 'Graphic Designer',
-        'photo' => 'images/member_profile/default.png',
-        'tagline' => 'Building the future with Devthugs.',
-        'skills' => ['Development', 'Collaboration', 'Innovation'],
-        'projects' => [
-            ['title' => 'Devthugs Platform', 'description' => 'Contributing to core product and web experiences.'],
-        ],
-    ],
+    $member('Vincent', 'vincent.png', 'Graphic Designer'),
     $member('Zyrone', 'zyrone.png', 'Post-production Specialist'),
 
     $member('Laurence', 'laur.png', 'Product Manager'),

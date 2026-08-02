@@ -11,10 +11,16 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div class="relative w-full aspect-video lg:aspect-square rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,240,255,0.1)] group">
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=3654%2B57W%2C+City+of+Tandag%2C+Surigao+del+Sur"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open Devthugs headquarters in Google Maps"
+                class="relative block w-full aspect-video lg:aspect-square rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,240,255,0.1)] group cursor-pointer hover:border-neon-cyan/40 transition-colors duration-300"
+            >
                 <img
-                    src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80"
-                    alt="Office Location"
+                    src="{{ asset('images/img/location.png') }}"
+                    alt="Devthugs headquarters map — tap to open in Google Maps"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 >
                 <div class="absolute inset-0 bg-gradient-to-t from-dark-base via-dark-base/40 to-transparent opacity-80"></div>
@@ -30,7 +36,7 @@
                         <p class="font-inter text-white/70 pl-10">Surigao City, Philippines</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <div class="flex flex-col gap-8">
                 <div class="flex items-start gap-6 p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-neon-cyan/30 transition-colors duration-300">
@@ -43,8 +49,8 @@
                     <div>
                         <h4 class="font-orbitron text-lg font-bold text-white mb-2">Address</h4>
                         <p class="font-inter text-white/60 leading-relaxed">
-                            123 Innovation Drive, Tech District<br>
-                            Surigao City, 8400<br>
+                            Purok Maligaya 1, Tanabog Rosario<br>
+                            Tanday City, Surigao del Sur 8300<br>
                             Philippines
                         </p>
                     </div>
@@ -59,8 +65,7 @@
                     <div>
                         <h4 class="font-orbitron text-lg font-bold text-white mb-2">Email</h4>
                         <p class="font-inter text-white/60 leading-relaxed">
-                            hello@devthugs.com<br>
-                            support@devthugs.com
+                            devthugscompanyofficial@gmail.com<br>
                         </p>
                     </div>
                 </div>
@@ -74,8 +79,7 @@
                     <div>
                         <h4 class="font-orbitron text-lg font-bold text-white mb-2">Phone</h4>
                         <p class="font-inter text-white/60 leading-relaxed">
-                            +63 (912) 345-6789<br>
-                            +63 (998) 765-4321
+                            +63 (966) 184-1984<br>                           
                         </p>
                     </div>
                 </div>
@@ -89,8 +93,9 @@
                     <div>
                         <h4 class="font-orbitron text-lg font-bold text-white mb-2">Business Hours</h4>
                         <p class="font-inter text-white/60 leading-relaxed">
-                            Monday - Friday: 9:00 AM - 6:00 PM (PHT)<br>
-                            Weekend: Closed
+                            Monday - Friday: 9:00 AM - 11:59 PM (PHT)<br>
+                            Saturday: 24hrs open<br>
+                            Sunday: Closed
                         </p>
                     </div>
                 </div>
