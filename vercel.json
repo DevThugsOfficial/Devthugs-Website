@@ -43,8 +43,6 @@
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
     "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": ":memory:"
+    "LOG_CHANNEL": "stderr"
   }
 }
