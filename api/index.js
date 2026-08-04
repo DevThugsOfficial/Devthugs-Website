@@ -227,12 +227,27 @@ function runPhpCgi(env, body) {
         return;
       }
 
-      const parsed = parseCgiOutput(Buffer.concat(stdout));
-      if ((!parsed.body || parsed.body.length === 0) && (errText || code)) {
-        parsed.statusCode = parsed.statusCode || 500;
-        parsed.headers['content-type'] = 'text/plain; charset=utf-8';
+      const raw = Buffer.concat(stdout);
+      const parsed = parseCgiOutput(raw);
+      if (!parsed.body || parsed.body.length === 0) {
+        parsed.statusCode = parsed.statusCode >= 400 ? parsed.statusCode : 500;
+        parsed.headers = { 'content-type': 'text/plain; charset=utf-8' };
         parsed.body = Buffer.from(
-          `Empty PHP response (exit ${code ?? 0}).\n\nSTDERR:\n${errText || '(none)'}\n\nSTDOUT headers were present but body was empty.`
+          [
+            `Empty PHP response (exit ${code ?? 0}).`,
+            '',
+            `STDERR:`,
+            errText || '(none)',
+            '',
+            `RAW STDOUT (${raw.length} bytes):`,
+            raw.toString('utf8').slice(0, 4000) || '(none)',
+            '',
+            `PHP_CGI: ${PHP_CGI}`,
+            `ENTRY: ${ENTRY}`,
+            `PHP exists: ${fs.existsSync(PHP_CGI)}`,
+            `ENTRY exists: ${fs.existsSync(ENTRY)}`,
+            `vendor: ${fs.existsSync(path.join(ROOT, 'vendor', 'autoload.php'))}`,
+          ].join('\n')
         );
       }
       resolve(parsed);
@@ -245,6 +260,23 @@ function runPhpCgi(env, body) {
 
 module.exports = async function handler(req, res) {
   try {
+    if ((req.url || '').includes('__bridge=1')) {
+      res.statusCode = 200;
+      res.setHeader('content-type', 'text/plain; charset=utf-8');
+      res.end(
+        [
+          'bridge-ok',
+          `url=${req.url}`,
+          `php=${PHP_CGI} exists=${fs.existsSync(PHP_CGI)}`,
+          `entry=${ENTRY} exists=${fs.existsSync(ENTRY)}`,
+          `vendor=${fs.existsSync(path.join(ROOT, 'vendor', 'autoload.php'))}`,
+          `resolved=${resolveRequestUri(req)}`,
+          `headers=${JSON.stringify(req.headers, null, 2)}`,
+        ].join('\n')
+      );
+      return;
+    }
+
     const body = ['POST', 'PUT', 'PATCH'].includes((req.method || 'GET').toUpperCase())
       ? await collectBody(req)
       : Buffer.alloc(0);
@@ -261,11 +293,13 @@ module.exports = async function handler(req, res) {
 
     const preview = result.body.toString('utf8', 0, Math.min(result.body.length, 200)).toLowerCase();
     const looksLikeHtml = preview.includes('<!doctype') || preview.includes('<html') || preview.includes('<head');
+    const looksLikePlain = (headers['content-type'] || '').includes('text/plain');
     if (
-      looksLikeHtml ||
-      !headers['content-type'] ||
-      headers['content-type'].includes('octet-stream') ||
-      headers['content-type'].includes('x-httpd-php')
+      !looksLikePlain &&
+      (looksLikeHtml ||
+        !headers['content-type'] ||
+        headers['content-type'].includes('octet-stream') ||
+        headers['content-type'].includes('x-httpd-php'))
     ) {
       headers['content-type'] = 'text/html; charset=utf-8';
     }
