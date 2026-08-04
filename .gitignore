@@ -13,7 +13,8 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
+# Keep built Vite assets in git for Vercel PHP deploys (no reliable Node build step there)
+# /public/build
 /public/hot
 /public/storage
 /storage/*.key
