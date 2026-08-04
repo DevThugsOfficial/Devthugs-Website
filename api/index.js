@@ -21,9 +21,48 @@ function writeRuntimeIni() {
   const runtimeIni = path.join('/tmp', 'devthugs-php.ini');
   let ini = fs.readFileSync(PHP_INI_SRC, 'utf8');
   ini = ini.replace(/extension_dir\s*=\s*.*/i, `extension_dir=${modulesDir}`);
-  // Keep only extensions we need for Laravel + Supabase
+  ini += `
+display_errors=1
+display_startup_errors=1
+html_errors=1
+log_errors=1
+error_reporting=E_ALL
+cgi.force_redirect=0
+cgi.fix_pathinfo=1
+`;
   fs.writeFileSync(runtimeIni, ini);
   return runtimeIni;
+}
+
+function resolveRequestUri(req) {
+  const rawUrl = req.url || '/';
+  const { pathname, query } = parseUrl(rawUrl, true);
+
+  // Prefer original browser path passed by rewrite (?__path=/contact)
+  if (query && typeof query.__path === 'string' && query.__path.startsWith('/')) {
+    return query.__path;
+  }
+
+  const headerCandidates = [
+    req.headers['x-invoke-path'],
+    req.headers['x-matched-path'],
+    req.headers['x-forwarded-uri'],
+    req.headers['x-vercel-forwarded-path'],
+  ];
+
+  for (const candidate of headerCandidates) {
+    if (!candidate) continue;
+    const value = Array.isArray(candidate) ? candidate[0] : String(candidate);
+    if (value.startsWith('/') && !value.startsWith('/api')) {
+      return value.split('?')[0] || '/';
+    }
+  }
+
+  if (pathname && pathname !== '/api' && pathname !== '/api/index') {
+    return pathname;
+  }
+
+  return '/';
 }
 
 function collectBody(req) {
@@ -39,7 +78,23 @@ function buildCgiEnv(req, body) {
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
   const proto = (req.headers['x-forwarded-proto'] || 'https').toString().split(',')[0].trim();
   const rawUrl = req.url || '/';
-  const { query } = parseUrl(rawUrl);
+  const parsed = parseUrl(rawUrl, true);
+  const requestPath = resolveRequestUri(req);
+
+  // Rebuild query string without the internal __path helper
+  const forwardQuery = { ...(parsed.query || {}) };
+  delete forwardQuery.__path;
+  const queryString = Object.entries(forwardQuery)
+    .flatMap(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((item) => `${encodeURIComponent(key)}=${encodeURIComponent(String(item))}`);
+      }
+      if (value == null) return [`${encodeURIComponent(key)}=`];
+      return [`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`];
+    })
+    .join('&');
+
+  const requestUri = queryString ? `${requestPath}?${queryString}` : requestPath;
 
   const env = {
     ...process.env,
@@ -52,15 +107,17 @@ function buildCgiEnv(req, body) {
     SERVER_PROTOCOL: 'HTTP/1.1',
     GATEWAY_INTERFACE: 'CGI/1.1',
     REQUEST_METHOD: req.method || 'GET',
-    REQUEST_URI: rawUrl,
-    QUERY_STRING: query || '',
-    SCRIPT_NAME: '/api/laravel.php',
+    REQUEST_URI: requestUri,
+    QUERY_STRING: queryString,
+    SCRIPT_NAME: '/index.php',
     SCRIPT_FILENAME: ENTRY,
+    PATH_INFO: requestPath === '/' ? '' : requestPath,
     PATH_TRANSLATED: ENTRY,
     DOCUMENT_ROOT: ROOT,
     HTTPS: proto === 'https' ? 'on' : '',
     HTTP_HOST: host,
     CONTENT_LENGTH: String(body.length),
+    VERCEL: process.env.VERCEL || '1',
   };
 
   if (req.headers['content-type']) {
@@ -156,18 +213,29 @@ function runPhpCgi(env, body) {
     });
 
     php.on('close', (code) => {
-      if (stderr.length) {
-        console.error(Buffer.concat(stderr).toString('utf8'));
+      const errText = stderr.length ? Buffer.concat(stderr).toString('utf8') : '';
+      if (errText) {
+        console.error(errText);
       }
+
       if (code && code !== 0 && stdout.length === 0) {
         resolve({
           statusCode: 500,
           headers: { 'content-type': 'text/plain; charset=utf-8' },
-          body: Buffer.from(`PHP CGI exited with code ${code}`),
+          body: Buffer.from(`PHP CGI exited with code ${code}\n\n${errText}`),
         });
         return;
       }
-      resolve(parseCgiOutput(Buffer.concat(stdout)));
+
+      const parsed = parseCgiOutput(Buffer.concat(stdout));
+      if ((!parsed.body || parsed.body.length === 0) && (errText || code)) {
+        parsed.statusCode = parsed.statusCode || 500;
+        parsed.headers['content-type'] = 'text/plain; charset=utf-8';
+        parsed.body = Buffer.from(
+          `Empty PHP response (exit ${code ?? 0}).\n\nSTDERR:\n${errText || '(none)'}\n\nSTDOUT headers were present but body was empty.`
+        );
+      }
+      resolve(parsed);
     });
 
     php.stdin.write(body);
