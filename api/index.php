@@ -1,26 +1,9 @@
 <?php
 
-/**
- * Vercel serverless entry point for Laravel.
- */
+header('Content-Type: text/plain; charset=utf-8');
 
-$storageDirs = [
-    '/tmp/storage',
-    '/tmp/storage/app',
-    '/tmp/storage/app/public',
-    '/tmp/storage/framework',
-    '/tmp/storage/framework/cache',
-    '/tmp/storage/framework/cache/data',
-    '/tmp/storage/framework/sessions',
-    '/tmp/storage/framework/testing',
-    '/tmp/storage/framework/views',
-    '/tmp/storage/logs',
-];
-
-foreach ($storageDirs as $dir) {
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0777, true);
-    }
-}
-
-require __DIR__ . '/../public/index.php';
+echo "PHP OK\n";
+echo 'version=' . PHP_VERSION . "\n";
+echo 'vercel=' . (getenv('VERCEL') !== false ? 'yes' : 'no') . "\n";
+echo 'vendor=' . (file_exists(__DIR__ . '/../vendor/autoload.php') ? 'yes' : 'no') . "\n";
+echo 'public=' . (file_exists(__DIR__ . '/../public/index.php') ? 'yes' : 'no') . "\n";

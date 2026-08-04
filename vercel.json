@@ -3,63 +3,13 @@
   "framework": null,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.9.0",
-      "maxDuration": 30,
-      "memory": 1024
+      "runtime": "vercel-php@0.9.0"
     }
   },
   "routes": [
     {
-      "src": "/build/(.*)",
-      "dest": "/public/build/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/public/robots.txt"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/public/images/$1"
-    },
-    {
-      "src": "/videos/(.*)",
-      "dest": "/public/videos/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
-  ],
-  "env": {
-    "APP_NAME": "DevThugs",
-    "APP_ENV": "production",
-    "APP_DEBUG": "true",
-    "APP_KEY": "base64:HQ0GUVj4BpxdVc/rChwlUBQgcemVeui0sHJZEIv7JbE=",
-    "APP_URL": "https://devthugs-website-ten.vercel.app",
-    "APP_CONFIG_CACHE": "/tmp/config.php",
-    "APP_EVENTS_CACHE": "/tmp/events.php",
-    "APP_PACKAGES_CACHE": "/tmp/packages.php",
-    "APP_ROUTES_CACHE": "/tmp/routes.php",
-    "APP_SERVICES_CACHE": "/tmp/services.php",
-    "VIEW_COMPILED_PATH": "/tmp",
-    "LOG_CHANNEL": "stderr",
-    "LOG_LEVEL": "debug",
-    "CACHE_STORE": "array",
-    "CACHE_DRIVER": "array",
-    "SESSION_DRIVER": "cookie",
-    "QUEUE_CONNECTION": "sync",
-    "DB_CONNECTION": "pgsql",
-    "DB_HOST": "aws-1-ap-northeast-2.pooler.supabase.com",
-    "DB_PORT": "5432",
-    "DB_DATABASE": "postgres",
-    "DB_USERNAME": "postgres.mglzjzhzhkynqnwqfytg",
-    "DB_SSLMODE": "require",
-    "MAIL_MAILER": "log",
-    "FILESYSTEM_DISK": "local",
-    "AI_CHAT_ENABLED": "false"
-  }
+  ]
 }
