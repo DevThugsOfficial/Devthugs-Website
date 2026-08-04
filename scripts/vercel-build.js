@@ -1,4 +1,3 @@
-const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -8,7 +7,6 @@ const bridgeRoot = path.join(root, 'api', '_phpbridge');
 const phpDir = path.join(bridgeRoot, 'php');
 const libDir = path.join(bridgeRoot, 'lib');
 const phpBin = path.join(phpDir, 'php');
-const composerBin = path.join(phpDir, 'composer');
 const distDir = path.join(root, 'dist');
 const publicDir = path.join(root, 'public');
 
@@ -18,26 +16,20 @@ function log(...args) {
 
 function chmodSafe(filePath) {
   try {
-    if (fs.existsSync(filePath)) {
-      fs.chmodSync(filePath, 0o755);
-    }
+    if (fs.existsSync(filePath)) fs.chmodSync(filePath, 0o755);
   } catch (error) {
     log('chmod skipped:', filePath, error.message);
   }
 }
 
 function copyDir(src, dest) {
-  if (!fs.existsSync(src)) {
-    return;
-  }
-
+  if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
 
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const from = path.join(src, entry.name);
     const to = path.join(dest, entry.name);
 
-    // Skip broken Laravel public/storage symlink and other symlinks
     if (entry.isSymbolicLink()) {
       log('Skipping symlink:', from);
       continue;
@@ -54,13 +46,18 @@ function copyDir(src, dest) {
   }
 }
 
+function patchPhpIni() {
+  const iniPath = path.join(phpDir, 'php.ini');
+  const modulesDir = path.join(phpDir, 'modules');
+  let ini = fs.readFileSync(iniPath, 'utf8');
+  ini = ini.replace(/extension_dir\s*=\s*.*/i, `extension_dir=${modulesDir.replace(/\\/g, '/')}`);
+  fs.writeFileSync(iniPath, ini);
+  log('Patched php.ini extension_dir ->', modulesDir);
+}
+
 function preparePhpBridge() {
   if (!fs.existsSync(srcPhpRoot)) {
     console.error('[vercel-build] Missing @libphp package at', srcPhpRoot);
-    console.error('[vercel-build] node_modules listing:');
-    try {
-      console.error(fs.readdirSync(path.join(root, 'node_modules')).join(', '));
-    } catch (_) {}
     process.exit(1);
   }
 
@@ -70,7 +67,8 @@ function preparePhpBridge() {
   copyDir(path.join(srcPhpRoot, 'lib'), libDir);
   chmodSafe(phpBin);
   chmodSafe(path.join(phpDir, 'php-cgi'));
-  chmodSafe(composerBin);
+  chmodSafe(path.join(phpDir, 'composer'));
+  patchPhpIni();
 
   if (!fs.existsSync(phpBin) || !fs.existsSync(path.join(phpDir, 'php-cgi'))) {
     console.error('[vercel-build] PHP binaries were not copied correctly');
@@ -86,21 +84,24 @@ function prepareDist() {
   fs.writeFileSync(path.join(distDir, '.vercel-static'), 'ok\n');
 }
 
-function runComposer() {
-  log('Installing Composer dependencies with bundled PHP...');
-
-  if (process.platform !== 'linux') {
-    log(`Skipping Composer on platform=${process.platform}`);
+function ensureVendorOrComposer() {
+  const autoload = path.join(root, 'vendor', 'autoload.php');
+  if (fs.existsSync(autoload)) {
+    log('Using existing vendor/autoload.php');
     return;
   }
 
-  if (!fs.existsSync(phpBin) || !fs.existsSync(composerBin)) {
-    console.error('[vercel-build] PHP/Composer binary missing for Linux build');
+  if (process.platform !== 'linux') {
+    console.error('[vercel-build] vendor/ missing and cannot run Linux PHP Composer locally');
     process.exit(1);
   }
 
-  // Sanity check that the Linux PHP binary can start
-  const phpCheck = spawnSync(phpBin, ['-v'], {
+  log('Running Composer install with patched PHP...');
+  const { spawnSync } = require('child_process');
+  const composerBin = path.join(phpDir, 'composer');
+  chmodSafe(composerBin);
+
+  const phpCheck = spawnSync(phpBin, ['-c', path.join(phpDir, 'php.ini'), '-m'], {
     cwd: root,
     encoding: 'utf8',
     env: {
@@ -109,20 +110,17 @@ function runComposer() {
       LD_LIBRARY_PATH: `${libDir}:${process.env.LD_LIBRARY_PATH || ''}`,
     },
   });
-
+  log('PHP modules sample:', String(phpCheck.stdout || '').split('\n').slice(0, 8).join(', '));
   if (phpCheck.status !== 0) {
-    console.error('[vercel-build] Bundled PHP failed to start');
-    console.error(phpCheck.stdout || '');
-    console.error(phpCheck.stderr || '');
-    console.error(phpCheck.error || '');
+    console.error(phpCheck.stderr || phpCheck.stdout || phpCheck.error);
     process.exit(1);
   }
-
-  log(String(phpCheck.stdout || '').split('\n')[0]);
 
   const result = spawnSync(
     phpBin,
     [
+      '-c',
+      path.join(phpDir, 'php.ini'),
       composerBin,
       'install',
       '--no-dev',
@@ -146,39 +144,21 @@ function runComposer() {
     }
   );
 
-  if (result.error) {
-    console.error('[vercel-build] Composer spawn error:', result.error);
-    process.exit(1);
-  }
-
   if (result.status !== 0) {
     console.error('[vercel-build] Composer install failed with status', result.status);
     process.exit(result.status || 1);
   }
 
-  if (!fs.existsSync(path.join(root, 'vendor', 'autoload.php'))) {
+  if (!fs.existsSync(autoload)) {
     console.error('[vercel-build] vendor/autoload.php still missing after Composer');
     process.exit(1);
   }
 }
 
-function runVite() {
-  const manifest = path.join(publicDir, 'build', 'manifest.json');
-  if (fs.existsSync(manifest)) {
-    log('Using committed Vite build assets (public/build)');
-    copyDir(publicDir, distDir);
-    return;
-  }
-
-  log('No committed Vite assets; skipping frontend build on Vercel');
-  copyDir(publicDir, distDir);
-}
-
 try {
   preparePhpBridge();
   prepareDist();
-  runComposer();
-  runVite();
+  ensureVendorOrComposer();
   log('Vercel build complete');
 } catch (error) {
   console.error('[vercel-build] Fatal error:', error);

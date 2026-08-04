@@ -7,13 +7,23 @@ const ROOT = path.join(__dirname, '..');
 const PHP_DIR = path.join(__dirname, '_phpbridge', 'php');
 const LIB_DIR = path.join(__dirname, '_phpbridge', 'lib');
 const PHP_CGI = path.join(PHP_DIR, 'php-cgi');
-const PHP_INI = path.join(PHP_DIR, 'php.ini');
+const PHP_INI_SRC = path.join(PHP_DIR, 'php.ini');
 const ENTRY = path.join(__dirname, 'laravel.php');
 
 function ensureExecutable(filePath) {
   try {
     fs.chmodSync(filePath, 0o755);
   } catch (_) {}
+}
+
+function writeRuntimeIni() {
+  const modulesDir = path.join(PHP_DIR, 'modules');
+  const runtimeIni = path.join('/tmp', 'devthugs-php.ini');
+  let ini = fs.readFileSync(PHP_INI_SRC, 'utf8');
+  ini = ini.replace(/extension_dir\s*=\s*.*/i, `extension_dir=${modulesDir}`);
+  // Keep only extensions we need for Laravel + Supabase
+  fs.writeFileSync(runtimeIni, ini);
+  return runtimeIni;
 }
 
 function collectBody(req) {
@@ -124,7 +134,8 @@ function runPhpCgi(env, body) {
       return;
     }
 
-    const php = spawn(PHP_CGI, ['-c', PHP_INI, ENTRY], {
+    const runtimeIni = writeRuntimeIni();
+    const php = spawn(PHP_CGI, ['-c', runtimeIni, ENTRY], {
       env,
       cwd: PHP_DIR,
       stdio: ['pipe', 'pipe', 'pipe'],

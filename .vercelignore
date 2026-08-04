@@ -9,6 +9,5 @@
 /storage/framework/sessions
 /storage/framework/views
 /_archive_react
-/vendor
 /dist
 /api/_phpbridge
