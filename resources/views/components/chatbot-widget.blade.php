@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             console.log('Sending chatbot request:', {
-                url: '/api/chatbot/message',
+                url: '/backend/chatbot/message',
                 message: message,
                 session_token: sessionToken
             });
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const response = await fetch('/api/chatbot/message', {
+            const response = await fetch('/backend/chatbot/message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!sessionToken) return;
 
         try {
-            const response = await fetch(`/api/chatbot/session/${sessionToken}/messages`);
+            const response = await fetch(`/backend/chatbot/session/${sessionToken}/messages`);
             const data = await response.json();
 
             if (data.success && data.messages.length > 0) {

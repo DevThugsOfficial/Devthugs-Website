@@ -1,21 +1,21 @@
 {
   "version": 2,
   "framework": null,
+  "buildCommand": "node scripts/vercel-build.js",
+  "installCommand": "npm install --omit=dev",
   "outputDirectory": "dist",
   "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.9.0",
+    "api/index.js": {
+      "memory": 1024,
       "maxDuration": 30,
-      "memory": 1024
+      "includeFiles": "{api/laravel.php,api/_phpbridge/**,app/**,bootstrap/**,config/**,database/**,resources/**,routes/**,vendor/**,public/index.php,public/build/**,composer.json,composer.lock,artisan}"
     }
   },
-  "routes": [
-    { "src": "/build/(.*)", "dest": "/public/build/$1" },
-    { "src": "/images/(.*)", "dest": "/public/images/$1" },
-    { "src": "/videos/(.*)", "dest": "/public/videos/$1" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
-    { "src": "/robots.txt", "dest": "/public/robots.txt" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+  "rewrites": [
+    {
+      "source": "/((?!build/|images/|videos/|favicon.ico|robots.txt).*)",
+      "destination": "/api"
+    }
   ],
   "env": {
     "APP_NAME": "DevThugs",

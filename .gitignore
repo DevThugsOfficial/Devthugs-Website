@@ -13,13 +13,15 @@
 /.zed
 /auth.json
 /node_modules
-# Keep built Vite assets in git for Vercel PHP deploys (no reliable Node build step there)
+# Keep built Vite assets in git for Vercel PHP deploys
 # /public/build
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
 /vendor
+/dist
+/api/_phpbridge
 _ide_helper.php
 Homestead.json
 Homestead.yaml

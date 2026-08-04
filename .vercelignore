@@ -1,11 +1,14 @@
-/vendor
 /node_modules
 .env
 .env.*
 !.env.example
+!.env.vercel.example
 .phpunit.result.cache
 /storage/logs
 /storage/framework/cache
 /storage/framework/sessions
 /storage/framework/views
 /_archive_react
+/vendor
+/dist
+/api/_phpbridge
