@@ -3,3 +3,9 @@
 .env
 .env.*
 !.env.example
+.phpunit.result.cache
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+/_archive_react

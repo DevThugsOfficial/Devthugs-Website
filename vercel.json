@@ -3,19 +3,12 @@
   "framework": null,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.4",
+      "runtime": "vercel-php@0.9.0",
       "maxDuration": 30,
       "memory": 1024
-    },
-    "api/health.php": {
-      "runtime": "vercel-php@0.7.4"
     }
   },
   "routes": [
-    {
-      "src": "/health",
-      "dest": "/api/health.php"
-    },
     {
       "src": "/build/(.*)",
       "dest": "/public/build/$1"
@@ -57,10 +50,14 @@
     "LOG_LEVEL": "debug",
     "CACHE_STORE": "array",
     "CACHE_DRIVER": "array",
-    "SESSION_DRIVER": "array",
+    "SESSION_DRIVER": "cookie",
     "QUEUE_CONNECTION": "sync",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": "/tmp/database.sqlite",
+    "DB_CONNECTION": "pgsql",
+    "DB_HOST": "aws-1-ap-northeast-2.pooler.supabase.com",
+    "DB_PORT": "5432",
+    "DB_DATABASE": "postgres",
+    "DB_USERNAME": "postgres.mglzjzhzhkynqnwqfytg",
+    "DB_SSLMODE": "require",
     "MAIL_MAILER": "log",
     "FILESYSTEM_DISK": "local",
     "AI_CHAT_ENABLED": "false"
