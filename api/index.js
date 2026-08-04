@@ -96,6 +96,16 @@ function buildCgiEnv(req, body) {
 
   const requestUri = queryString ? `${requestPath}?${queryString}` : requestPath;
 
+  const clientIp = (
+    req.headers['x-real-ip'] ||
+    req.headers['x-vercel-forwarded-for'] ||
+    req.headers['x-forwarded-for'] ||
+    '127.0.0.1'
+  )
+    .toString()
+    .split(',')[0]
+    .trim();
+
   const env = {
     ...process.env,
     PATH: `${PHP_DIR}:${process.env.PATH || ''}`,
@@ -114,6 +124,8 @@ function buildCgiEnv(req, body) {
     PATH_INFO: requestPath === '/' ? '' : requestPath,
     PATH_TRANSLATED: ENTRY,
     DOCUMENT_ROOT: ROOT,
+    REMOTE_ADDR: clientIp,
+    REMOTE_PORT: '443',
     HTTPS: proto === 'https' ? 'on' : '',
     HTTP_HOST: host,
     CONTENT_LENGTH: String(body.length),

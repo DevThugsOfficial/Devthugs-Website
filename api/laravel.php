@@ -33,6 +33,15 @@ putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 $_SERVER['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
 
+// Symfony trusted-proxy checks require a non-null REMOTE_ADDR under CGI.
+if (empty($_SERVER['REMOTE_ADDR'])) {
+    $forwarded = $_SERVER['HTTP_X_REAL_IP']
+        ?? $_SERVER['HTTP_X_VERCEL_FORWARDED_FOR']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? '127.0.0.1';
+    $_SERVER['REMOTE_ADDR'] = trim(explode(',', (string) $forwarded)[0]);
+}
+
 define('LARAVEL_START', microtime(true));
 
 try {
