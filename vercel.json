@@ -5,10 +5,18 @@
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.4",
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "api/health.php": {
+      "runtime": "vercel-php@0.7.4"
     }
   },
   "routes": [
+    {
+      "src": "/health",
+      "dest": "/api/health.php"
+    },
     {
       "src": "/build/(.*)",
       "dest": "/public/build/$1"
@@ -45,11 +53,12 @@
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "APP_SERVICES_CACHE": "/tmp/services.php",
-    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+    "VIEW_COMPILED_PATH": "/tmp",
     "LOG_CHANNEL": "stderr",
-    "LOG_LEVEL": "error",
+    "LOG_LEVEL": "debug",
     "CACHE_STORE": "array",
-    "SESSION_DRIVER": "cookie",
+    "CACHE_DRIVER": "array",
+    "SESSION_DRIVER": "array",
     "QUEUE_CONNECTION": "sync",
     "DB_CONNECTION": "sqlite",
     "DB_DATABASE": "/tmp/database.sqlite",
