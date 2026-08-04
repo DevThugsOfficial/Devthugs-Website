@@ -1,10 +1,12 @@
 <?php
 
+/**
+ * Vercel serverless entry point for Laravel.
+ */
+
 ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Ensure writable directories in /tmp for Vercel Serverless environment
 $storageDirs = [
     '/tmp/storage',
     '/tmp/storage/app',
@@ -17,16 +19,19 @@ $storageDirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/logs',
     '/tmp/bootstrap/cache',
+    '/tmp/views',
 ];
 
 foreach ($storageDirs as $dir) {
-    if (!file_exists($dir)) {
-        @mkdir($dir, 0755, true);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0777, true);
     }
 }
 
-// Forward execution to Laravel's entry point
+// Ensure sqlite file exists when using DB_CONNECTION=sqlite on Vercel
+$dbPath = getenv('DB_DATABASE') ?: '/tmp/database.sqlite';
+if (is_string($dbPath) && str_ends_with($dbPath, '.sqlite') && !file_exists($dbPath)) {
+    @touch($dbPath);
+}
+
 require __DIR__ . '/../public/index.php';
-
-
-

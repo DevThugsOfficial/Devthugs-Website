@@ -1,9 +1,11 @@
 {
   "version": 2,
   "framework": null,
+  "buildCommand": "npm install && npm run build",
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.1"
+      "runtime": "vercel-php@0.7.4",
+      "maxDuration": 30
     }
   },
   "routes": [
@@ -33,11 +35,26 @@
     }
   ],
   "env": {
+    "APP_NAME": "DevThugs",
     "APP_ENV": "production",
     "APP_DEBUG": "true",
+    "APP_KEY": "base64:HQ0GUVj4BpxdVc/rChwlUBQgcemVeui0sHJZEIv7JbE=",
+    "APP_URL": "https://devthugs-website-ten.vercel.app",
+    "APP_CONFIG_CACHE": "/tmp/config.php",
+    "APP_EVENTS_CACHE": "/tmp/events.php",
+    "APP_PACKAGES_CACHE": "/tmp/packages.php",
+    "APP_ROUTES_CACHE": "/tmp/routes.php",
+    "APP_SERVICES_CACHE": "/tmp/services.php",
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+    "LOG_CHANNEL": "stderr",
+    "LOG_LEVEL": "error",
     "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr"
+    "QUEUE_CONNECTION": "sync",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": "/tmp/database.sqlite",
+    "MAIL_MAILER": "log",
+    "FILESYSTEM_DISK": "local",
+    "AI_CHAT_ENABLED": "false"
   }
 }
