@@ -22,7 +22,7 @@ function chmodSafe(filePath) {
   }
 }
 
-function copyDir(src, dest) {
+function copyDir(src, dest, options = {}) {
   if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
 
@@ -35,8 +35,19 @@ function copyDir(src, dest) {
       continue;
     }
 
+    // Never publish PHP sources as static files (browsers download them)
+    if (entry.isFile() && entry.name.toLowerCase().endsWith('.php')) {
+      log('Skipping PHP file from dist:', from);
+      continue;
+    }
+
+    if (options.skipNames && options.skipNames.has(entry.name)) {
+      log('Skipping:', from);
+      continue;
+    }
+
     if (entry.isDirectory()) {
-      copyDir(from, to);
+      copyDir(from, to, options);
       continue;
     }
 

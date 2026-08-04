@@ -185,8 +185,24 @@ module.exports = async function handler(req, res) {
     const result = await runPhpCgi(env, body);
 
     res.statusCode = result.statusCode;
-    for (const [key, value] of Object.entries(result.headers)) {
-      if (key === 'transfer-encoding') continue;
+
+    // Force a browser-renderable content type (never let PHP CGI mark this as a download)
+    const headers = { ...result.headers };
+    delete headers['content-disposition'];
+    delete headers['transfer-encoding'];
+
+    const preview = result.body.toString('utf8', 0, Math.min(result.body.length, 200)).toLowerCase();
+    const looksLikeHtml = preview.includes('<!doctype') || preview.includes('<html') || preview.includes('<head');
+    if (
+      looksLikeHtml ||
+      !headers['content-type'] ||
+      headers['content-type'].includes('octet-stream') ||
+      headers['content-type'].includes('x-httpd-php')
+    ) {
+      headers['content-type'] = 'text/html; charset=utf-8';
+    }
+
+    for (const [key, value] of Object.entries(headers)) {
       res.setHeader(key, value);
     }
     res.end(result.body);
