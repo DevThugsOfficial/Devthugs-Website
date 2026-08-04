@@ -2,7 +2,7 @@
   "version": 2,
   "framework": null,
   "buildCommand": "node scripts/vercel-build.js",
-  "installCommand": "npm install --omit=dev",
+  "installCommand": "npm install",
   "outputDirectory": "dist",
   "functions": {
     "api/index.js": {
