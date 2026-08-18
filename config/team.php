@@ -1,6 +1,6 @@
 <?php
 
-$member = static fn (string $name, string $file, string $role = 'Team Member') => [
+$member = static fn (string $name, string $file, string $role = 'Team Member', ?string $portfolioUrl = null) => [
     'name' => $name,
     'role' => $role,
     'tagline' => 'Building the future with Devthugs.',
@@ -9,6 +9,7 @@ $member = static fn (string $name, string $file, string $role = 'Team Member') =
     'projects' => [
         ['title' => 'Devthugs Platform', 'description' => 'Contributing to core product and web experiences.'],
     ],
+    'portfolio_url' => $portfolioUrl,
 ];
 
 return [
@@ -23,7 +24,7 @@ return [
         ],
     ],
     $member('Carl Cedrik', 'cael.png', 'Chief Executive Officer'),
-    $member('Jhon Lloyd', 'cape.png', 'Chief Technology Officer'),
+    $member('Jhon Lloyd', 'cape.png', 'Chief Technology Officer', 'https://epacs.vercel.app/'),
     $member('Donard', 'donard.png', 'Chief Operating Officer'),
     $member('Shane', 'shane.png', 'Administrative Officer'),
     $member('Justine', 'justine.png', 'Finance Officer'),

@@ -471,6 +471,15 @@ function initTeamSection() {
             )
             .join('');
 
+        const portfolioUrl = typeof m.portfolio_url === 'string' ? m.portfolio_url.trim() : '';
+        const portfolioCtaClass =
+            'w-full py-4 rounded-xl border border-neon-cyan/50 text-neon-cyan font-orbitron font-bold flex items-center justify-center gap-2 hover:bg-neon-cyan/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300';
+        const portfolioIcon =
+            '<svg class="w-[18px] h-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>';
+        const portfolioCta = portfolioUrl
+            ? `<a href="${escapeHtml(portfolioUrl)}" target="_blank" rel="noopener noreferrer" class="${portfolioCtaClass}">View Full Portfolio ${portfolioIcon}</a>`
+            : `<button type="button" class="${portfolioCtaClass}" data-team-modal-close-inner>View Full Portfolio ${portfolioIcon}</button>`;
+
         modalBody.innerHTML = `
       <div class="flex flex-col sm:flex-row gap-8 items-start mb-10">
         <div class="w-28 h-28 shrink-0 rounded-full overflow-hidden bg-dark-base border-2 border-neon-cyan shadow-[0_0_20px_rgba(0,240,255,0.2)]">
@@ -496,10 +505,7 @@ function initTeamSection() {
           <div class="grid gap-4">${projects}</div>
         </div>
         <div class="pt-4">
-          <button type="button" class="w-full py-4 rounded-xl border border-neon-cyan/50 text-neon-cyan font-orbitron font-bold flex items-center justify-center gap-2 hover:bg-neon-cyan/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300" data-team-modal-close-inner>
-            View Full Portfolio
-            <svg class="w-[18px] h-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
-          </button>
+          ${portfolioCta}
         </div>
       </div>`;
 
