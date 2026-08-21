@@ -25,8 +25,9 @@ class ContactController extends Controller
         ]);
 
         try {
-            // Send email to DevThugs official email
-            Mail::to('devthugscompanyofficial@gmail.com')->send(new ContactMessage($validated));
+            $receiver = config('mail.contact_receiver', env('CONTACT_RECEIVER_EMAIL', 'devthugscompanyofficial@gmail.com'));
+
+            Mail::to($receiver)->send(new ContactMessage($validated));
         } catch (\Throwable $exception) {
             logger()->error('Contact form email failed', [
                 'error' => $exception->getMessage(),

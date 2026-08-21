@@ -45,7 +45,14 @@
     "DB_DATABASE": "postgres",
     "DB_USERNAME": "postgres.mglzjzhzhkynqnwqfytg",
     "DB_SSLMODE": "require",
-    "MAIL_MAILER": "log",
+    "MAIL_MAILER": "smtp",
+    "MAIL_HOST": "smtp.gmail.com",
+    "MAIL_PORT": "587",
+    "MAIL_USERNAME": "devthugscompanyofficial@gmail.com",
+    "MAIL_PASSWORD": "cdynsdvpbcyocemd",
+    "MAIL_FROM_ADDRESS": "devthugscompanyofficial@gmail.com",
+    "MAIL_FROM_NAME": "DevThugs",
+    "CONTACT_RECEIVER_EMAIL": "devthugscompanyofficial@gmail.com",
     "AI_CHAT_ENABLED": "false"
   }
 }
